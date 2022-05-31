@@ -65,6 +65,87 @@ jvm认为--没有指向，没有被引用的时候，该资源为垃圾就回收
 
 #### JVM内存分布
 
+#####  jVM内存
+
+- 线程私有
+  - 程序计数器
+    - 指向虚拟机字节码指令的位置
+    - 唯一一个无OOM的区域
+  - 虚拟机栈
+    - 虚拟机栈和线程的声明周期相同
+    - 一个线程中，每调用一个方法创建一个栈帧
+    - 栈帧的结构
+      - 本地变量表LocalVariable
+      - 操作数栈OperandStack
+      - 对运行时常量池的引用RuntimeConstant PoolReference
+    - 异常
+      - 线程请求的栈深度大于JVM做允许的深度StackOverflowError
+      - 若JVM允许动态扩展，若无法申请到足够内存OutOfMemoryError
+  - 本地方法栈
+    - 异常
+      - 线程请求的栈深度大于JVM所允许的深度StackOverflowError
+      - 若JVM允许动态扩展，若无法申请到足够内存OutOfMemoryError
+- 线程共享
+  - 方法区：MethodArea
+    - RuntimeConstantPool
+  - 类实例区(堆)：Objects
+    - 新生代	
+      - eden
+      - from survivor
+      - to survivor
+    - 老年代
+    - 异常
+      - OutOfMemoryError
+
+- 直接内存
+  - 不受JVM GC管理
+
+####  垃圾回收与算法
+
+##### JVM  GC
+
+- gc要做的三件事
+  - 哪些内存需要被回收
+  - 什么时候回收
+  - 怎么回收
+- 哪些对象已经“死亡”
+  - 引用计数法(Reference Counting)
+    - 循环引用的问题
+  - 根搜索算法(GC Roots Tracing)
+    - 通过一系列称为GCRoots的点作为起点，向下搜索。当一个对象到任何GC Roots没有引用链相连说明其已经死亡。
+    - GC Roots
+      - VM栈种的调用
+      - 方法区种的静态引用
+      - JNI中的引用
+- 垃圾回收算法
+  - 标记清除
+    - 效率低
+    - 内存碎片多
+  - 复制
+    - eden
+    - survivor
+  - 复制：Coping
+  - 标记整理：Mark-Compact
+  - 分代收集：Generational Collecting
+- 垃圾收集器
+  - Serial
+  - ParNew
+  - Parallel Scavenge
+  - Serial Old
+  - Parallel Old
+  - CMS-Concurrent Mark Sweep
+- 参数
+  - Xms
+  - Xmx
+  - Xmn
+  - -XX:+PrintGCDetails
+  - -XX:SurvivorTatio=8
+  - -XX:PretenuringThreshold
+  - -XX:MaxTenuringThreshold
+  - -XX:-HandlePromotionFailure
+
+
+
 #### 变量
 
 存储数据的空间。命名规范：由字母，数字，_,组成，不能以数字开头。
